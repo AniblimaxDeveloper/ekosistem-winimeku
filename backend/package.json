@@ -1,0 +1,25 @@
+{
+  "name": "winimeku-backend",
+  "version": "1.0.0",
+  "main": "dist/src/main.js",
+  "scripts": {
+    "build": "prisma generate && tsc",
+    "start": "node dist/src/main.js",
+    "dev": "ts-node-dev --respawn src/main.ts"
+  },
+  "dependencies": {
+    "@fastify/cors": "^9.0.1",
+    "@fastify/jwt": "^8.0.0",
+    "@prisma/client": "^5.11.0",
+    "bcryptjs": "^2.4.3",
+    "fastify": "^4.26.2",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.11.24",
+    "prisma": "^5.11.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.3.3"
+  }
+}
