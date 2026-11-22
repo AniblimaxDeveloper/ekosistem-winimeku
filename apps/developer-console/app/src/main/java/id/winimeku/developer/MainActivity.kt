@@ -24,7 +24,7 @@ interface AdminApi {
     @POST("api/v1/admin/anime") suspend fun addAnime(@Header("Authorization") token: String, @Body req: AnimeReq): Any
 }
 object AdminRetro {
-    const val BASE_URL = "http://192.168.1.255:3000/" 
+    const val BASE_URL = "http://192.168.1.8:3000/" 
     val api: AdminApi by lazy { Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).build().create(AdminApi::class.java) }
 }
 
