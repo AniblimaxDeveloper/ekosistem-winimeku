@@ -25,6 +25,7 @@ import coil.compose.AsyncImage
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
+import kotlinx.coroutines.launch // <--- IMPORT PENTING
 
 // --- RETROFIT API ---
 data class LoginReq(val email: String, val password: String)
@@ -37,7 +38,6 @@ interface ApiService {
     @GET("api/v1/anime") suspend fun getAnime(): List<Anime>
 }
 object Retro {
-    // GANTI IP INI DENGAN IP LOKAL LU / IP TERMUX
     const val BASE_URL = "http://192.168.1.10:3000/" 
     val api: ApiService by lazy { Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).build().create(ApiService::class.java) }
 }
@@ -67,6 +67,8 @@ class MainActivity : ComponentActivity() {
     var email by remember { mutableStateOf("admin@winimeku.com") }
     var pass by remember { mutableStateOf("password123") }
     var err by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope() // <--- GUNAKAN SCOPE COMPOSE
+    
     Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.Center) {
         Text("WIBINIME LOGIN", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(16.dp))
@@ -76,7 +78,7 @@ class MainActivity : ComponentActivity() {
         if (err.isNotEmpty()) Text(err, color = Color.Red)
         Spacer(Modifier.height(16.dp))
         Button(onClick = {
-            kotlinx.coroutines.MainScope().launch {
+            scope.launch { // <--- LAUNCH DI SINI
                 try {
                     val res = Retro.api.login(LoginReq(email, pass))
                     if (res.token != null) onSuccess(res.token) else err = res.error ?: "Gagal"

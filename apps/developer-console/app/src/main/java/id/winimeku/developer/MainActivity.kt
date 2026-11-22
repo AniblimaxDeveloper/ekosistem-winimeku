@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
+import kotlinx.coroutines.launch // <--- IMPORT PENTING
 
 data class LoginReq(val email: String, val password: String)
 data class LoginRes(val token: String?, val error: String?)
@@ -22,7 +23,6 @@ interface AdminApi {
     @POST("api/v1/admin/anime") suspend fun addAnime(@Header("Authorization") token: String, @Body req: AnimeReq): Any
 }
 object AdminRetro {
-    // GANTI IP INI DENGAN IP LOKAL LU
     const val BASE_URL = "http://192.168.1.10:3000/" 
     val api: AdminApi by lazy { Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).build().create(AdminApi::class.java) }
 }
@@ -43,13 +43,15 @@ class MainActivity : ComponentActivity() {
     var email by remember { mutableStateOf("admin@winimeku.com") }
     var pass by remember { mutableStateOf("password123") }
     var msg by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope() // <--- GUNAKAN SCOPE COMPOSE
+    
     Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.Center) {
         Text("WINIMEKU ADMIN", color = Color.Red, fontSize = 24.sp)
         TextField(value = email, onValueChange = { email = it }, label = { Text("Email") }, modifier = Modifier.fillMaxWidth())
         TextField(value = pass, onValueChange = { pass = it }, label = { Text("Password") }, modifier = Modifier.fillMaxWidth())
         Text(msg, color = Color.Red)
         Button(onClick = {
-            kotlinx.coroutines.MainScope().launch {
+            scope.launch { // <--- LAUNCH DI SINI
                 try {
                     val res = AdminRetro.api.login(LoginReq(email, pass))
                     if (res.token != null) onSuccess(res.token) else msg = "Login Gagal"
@@ -64,6 +66,7 @@ class MainActivity : ComponentActivity() {
     var synopsis by remember { mutableStateOf("") }
     var cover by remember { mutableStateOf("") }
     var status by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope() // <--- GUNAKAN SCOPE COMPOSE
 
     Column(Modifier.fillMaxSize().padding(24.dp)) {
         Text("TAMBAH ANIME BARU", color = Color.White, fontSize = 20.sp)
@@ -73,7 +76,7 @@ class MainActivity : ComponentActivity() {
         TextField(value = cover, onValueChange = { cover = it }, label = { Text("URL Gambar") }, modifier = Modifier.fillMaxWidth())
         Text(status, color = Color.Green, modifier = Modifier.padding(top = 8.dp))
         Button(onClick = {
-            kotlinx.coroutines.MainScope().launch {
+            scope.launch { // <--- LAUNCH DI SINI
                 try {
                     AdminRetro.api.addAnime("Bearer $token", AnimeReq(title, synopsis, cover))
                     status = "Sukses menambah Anime!"
